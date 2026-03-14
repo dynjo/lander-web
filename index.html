@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lander</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #000; overflow: hidden; font-family: monospace; }
+  canvas { display: block; }
+  #hud {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; color: #fff; font-size: 16px;
+  }
+  #score { position: absolute; top: 12px; left: 16px; }
+  #high-score { position: absolute; top: 12px; right: 16px; }
+  #fuel-bar-container {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 12px; border: 1px solid #888;
+  }
+  #fuel-bar { height: 100%; background: #0f0; transition: width 0.1s; }
+  #fuel-label { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); }
+  #lives { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); }
+  #altitude { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); }
+  #message {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 24px; text-align: center; display: none;
+  }
+  #start-screen {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #fff; z-index: 10; background: rgba(0,0,0,0.85);
+  }
+  #start-screen h1 { font-size: 48px; margin-bottom: 24px; color: #0f0; }
+  #start-screen p { font-size: 16px; margin: 4px 0; color: #ccc; }
+  #start-screen .start-btn {
+    margin-top: 32px; padding: 12px 32px; font-size: 20px; font-family: monospace;
+    background: #0a0; color: #fff; border: none; cursor: pointer;
+    pointer-events: all;
+  }
+  #start-screen .start-btn:hover { background: #0c0; }
+</style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="score">SCORE: 0</div>
+  <div id="high-score">HIGH: 0</div>
+  <div id="lives"></div>
+  <div id="altitude"></div>
+  <div id="fuel-label">FUEL</div>
+  <div id="fuel-bar-container"><div id="fuel-bar" style="width:100%"></div></div>
+  <div id="message"></div>
+</div>
+
+<div id="start-screen">
+  <h1>LANDER</h1>
+  <p>Arrow keys — steer ship</p>
+  <p>Z — full thrust</p>
+  <p>X — hover</p>
+  <p>C — fire</p>
+  <p style="margin-top:8px; color:#888;">Land gently on the launchpad to refuel</p>
+  <button class="start-btn" id="start-btn">START</button>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.172.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.172.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="js/game.js"></script>
+</body>
+</html>
