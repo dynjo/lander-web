@@ -100,17 +100,17 @@ class Game {
       }
     });
 
-    // Detect touch device: check touch support OR small screen (likely mobile)
-    const isTouchDevice = 'ontouchstart' in window
-      || navigator.maxTouchPoints > 0
-      || window.matchMedia('(pointer: coarse)').matches
-      || window.innerWidth <= 768;
+    // Detect touch device: coarse pointer (phone/tablet) or small screen.
+    // Avoid false positives from Mac trackpads (which report maxTouchPoints > 0).
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const isSmallScreen = window.innerWidth <= 768;
+    const isTouchDevice = isCoarsePointer || isSmallScreen;
     if (isTouchDevice) {
       document.body.classList.add('is-touch');
       this.setupTouchControls();
-    } else {
-      document.body.classList.add('is-desktop');
     }
+    // Always add is-desktop so keyboard instructions show
+    document.body.classList.add('is-desktop');
   }
 
   setupTouchControls() {

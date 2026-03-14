@@ -37,7 +37,7 @@
   #start-screen h1 { font-size: 40px; margin-bottom: 16px; color: #0f0; }
   #start-screen .info { font-size: 13px; color: #aaa; text-align: center; line-height: 1.6; }
   #start-screen .info b { color: #fff; }
-  #start-screen .desktop-info, #start-screen .touch-info { display: none; }
+  #start-screen .touch-info { display: none; }
   #start-screen .start-btn {
     margin-top: 24px; padding: 14px 40px; font-size: 20px; font-family: monospace;
     background: #0a0; color: #fff; border: none; cursor: pointer;
@@ -46,8 +46,7 @@
   #start-screen .start-btn:hover { background: #0c0; }
   #start-screen .hint { margin-top: 12px; font-size: 12px; color: #666; }
 
-  /* Show appropriate instructions */
-  .is-desktop #start-screen .desktop-info { display: block; }
+  /* Show touch instructions additionally on touch devices */
   .is-touch #start-screen .touch-info { display: block; }
 
   /* Touch controls */
