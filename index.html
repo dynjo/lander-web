@@ -46,8 +46,12 @@
   #start-screen .start-btn:hover { background: #0c0; }
   #start-screen .hint { margin-top: 12px; font-size: 12px; color: #666; }
 
-  /* Show touch instructions additionally on touch devices */
+  /* Show touch instructions on touch devices */
   .is-touch #start-screen .touch-info { display: block; }
+  @media (pointer: coarse), (any-pointer: coarse) {
+    #start-screen .touch-info { display: block !important; }
+    #touch-controls { display: block !important; }
+  }
 
   /* Touch controls */
   #touch-controls {

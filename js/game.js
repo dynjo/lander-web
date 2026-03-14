@@ -100,17 +100,26 @@ class Game {
       }
     });
 
-    // Detect touch device: coarse pointer (phone/tablet) or small screen.
-    // Avoid false positives from Mac trackpads (which report maxTouchPoints > 0).
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    const isSmallScreen = window.innerWidth <= 768;
-    const isTouchDevice = isCoarsePointer || isSmallScreen;
-    if (isTouchDevice) {
+    // Always enable keyboard
+    document.body.classList.add('is-desktop');
+
+    // Enable touch controls immediately if we can detect touch, or on first touch
+    const enableTouch = () => {
+      if (document.body.classList.contains('is-touch')) return;
       document.body.classList.add('is-touch');
       this.setupTouchControls();
+    };
+
+    // Detect upfront via multiple signals
+    if (window.matchMedia('(pointer: coarse)').matches
+      || window.matchMedia('(any-pointer: coarse)').matches
+      || ('ontouchstart' in window && window.innerWidth <= 1024)
+      || navigator.maxTouchPoints > 1) {
+      enableTouch();
     }
-    // Always add is-desktop so keyboard instructions show
-    document.body.classList.add('is-desktop');
+
+    // Fallback: enable on first actual touch event
+    window.addEventListener('touchstart', () => enableTouch(), { once: true });
   }
 
   setupTouchControls() {
