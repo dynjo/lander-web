@@ -100,26 +100,9 @@ class Game {
       }
     });
 
-    // Always enable keyboard
-    document.body.classList.add('is-desktop');
-
-    // Enable touch controls immediately if we can detect touch, or on first touch
-    const enableTouch = () => {
-      if (document.body.classList.contains('is-touch')) return;
-      document.body.classList.add('is-touch');
-      this.setupTouchControls();
-    };
-
-    // Detect upfront via multiple signals
-    if (window.matchMedia('(pointer: coarse)').matches
-      || window.matchMedia('(any-pointer: coarse)').matches
-      || ('ontouchstart' in window && window.innerWidth <= 1024)
-      || navigator.maxTouchPoints > 1) {
-      enableTouch();
-    }
-
-    // Fallback: enable on first actual touch event
-    window.addEventListener('touchstart', () => enableTouch(), { once: true });
+    // Always attach touch event listeners — CSS controls visibility via
+    // @media (pointer: coarse). The listeners are harmless on desktop.
+    this.setupTouchControls();
   }
 
   setupTouchControls() {
@@ -150,8 +133,8 @@ class Game {
       for (const t of e.changedTouches) {
         if (t.identifier === joystickTouchId) {
           joystickTouchId = null;
-          thumb.style.left = '45px';
-          thumb.style.top = '45px';
+          thumb.style.left = '41px';
+          thumb.style.top = '41px';
           // Release all steer keys
           this.player.handleKeyUp('ArrowLeft');
           this.player.handleKeyUp('ArrowRight');
