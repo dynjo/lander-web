@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Lander</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,78 +12,93 @@
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; color: #fff; font-size: 16px;
   }
-  #score { position: absolute; top: 12px; left: 16px; }
-  #high-score { position: absolute; top: 12px; right: 16px; }
+  #score { position: absolute; top: 8px; left: 12px; font-size: 14px; }
+  #high-score { position: absolute; top: 8px; right: 12px; font-size: 14px; }
   #fuel-bar-container {
-    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
-    width: 200px; height: 12px; border: 1px solid #888;
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    width: 160px; height: 10px; border: 1px solid #888;
   }
   #fuel-bar { height: 100%; background: #0f0; transition: width 0.1s; }
-  #fuel-label { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); }
-  #lives { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); }
-  #altitude { position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%); }
+  #fuel-label { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font-size: 12px; }
+  #lives { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); font-size: 14px; }
+  #altitude { position: absolute; bottom: 44px; left: 50%; transform: translateX(-50%); }
   #message {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    font-size: 24px; text-align: center; display: none;
+    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
+    font-size: 20px; text-align: center; display: none;
   }
+
+  /* Start screen */
   #start-screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     color: #fff; z-index: 10; background: rgba(0,0,0,0.85);
+    padding: 20px;
   }
-  #start-screen h1 { font-size: 48px; margin-bottom: 24px; color: #0f0; }
-  #start-screen p { font-size: 16px; margin: 4px 0; color: #ccc; }
-  #start-screen .controls-row { display: flex; gap: 32px; margin-top: 8px; }
-  #start-screen .controls-col p { text-align: left; }
-  #start-screen .controls-label { color: #888; font-size: 14px; margin-bottom: 4px; }
+  #start-screen h1 { font-size: 40px; margin-bottom: 16px; color: #0f0; }
+  #start-screen .info { font-size: 13px; color: #aaa; text-align: center; line-height: 1.6; }
+  #start-screen .info b { color: #fff; }
+  #start-screen .desktop-info, #start-screen .touch-info { display: none; }
   #start-screen .start-btn {
-    margin-top: 32px; padding: 12px 32px; font-size: 20px; font-family: monospace;
+    margin-top: 24px; padding: 14px 40px; font-size: 20px; font-family: monospace;
     background: #0a0; color: #fff; border: none; cursor: pointer;
-    pointer-events: all;
+    pointer-events: all; border-radius: 4px;
   }
   #start-screen .start-btn:hover { background: #0c0; }
+  #start-screen .hint { margin-top: 12px; font-size: 12px; color: #666; }
+
+  /* Show appropriate instructions */
+  .is-desktop #start-screen .desktop-info { display: block; }
+  .is-touch #start-screen .touch-info { display: block; }
 
   /* Touch controls */
   #touch-controls {
     display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 5;
   }
-  .touch-visible #touch-controls { display: block; }
+  .is-touch #touch-controls { display: block; }
+  /* Move fuel bar up on touch to not overlap buttons */
+  .is-touch #fuel-bar-container { bottom: 100px; }
+  .is-touch #fuel-label { bottom: 114px; }
 
   #joystick-zone {
-    position: absolute; bottom: 20px; left: 20px; width: 140px; height: 140px;
+    position: absolute; bottom: 30px; left: 20px; width: 120px; height: 120px;
     pointer-events: all; touch-action: none;
   }
   #joystick-base {
-    width: 140px; height: 140px; border-radius: 50%;
-    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2);
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(255,255,255,0.06); border: 2px solid rgba(255,255,255,0.15);
     position: relative;
   }
   #joystick-thumb {
-    width: 50px; height: 50px; border-radius: 50%;
-    background: rgba(255,255,255,0.3);
-    position: absolute; top: 45px; left: 45px;
-    transition: none;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    position: absolute; top: 38px; left: 38px;
   }
 
   #touch-buttons {
-    position: absolute; bottom: 20px; right: 20px;
-    display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+    position: absolute; bottom: 30px; right: 20px;
+    display: flex; flex-direction: column; gap: 8px; align-items: flex-end;
     pointer-events: all; touch-action: none;
   }
   .touch-btn {
-    width: 70px; height: 70px; border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.3);
-    background: rgba(255,255,255,0.08);
-    color: #fff; font-family: monospace; font-size: 11px; font-weight: bold;
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.06);
+    color: rgba(255,255,255,0.6); font-family: monospace; font-size: 10px; font-weight: bold;
     display: flex; align-items: center; justify-content: center;
     user-select: none; -webkit-user-select: none;
   }
   .touch-btn.active {
-    background: rgba(255,255,255,0.25);
-    border-color: rgba(255,255,255,0.6);
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
   }
-  #touch-buttons .row { display: flex; gap: 10px; }
+  .touch-row { display: flex; gap: 8px; }
+
+  @media (max-width: 480px) {
+    #start-screen h1 { font-size: 32px; }
+    #start-screen .info { font-size: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -106,7 +121,7 @@
   </div>
   <div id="touch-buttons">
     <div class="touch-btn" id="btn-thrust" data-key="z">THRUST</div>
-    <div class="row">
+    <div class="touch-row">
       <div class="touch-btn" id="btn-hover" data-key="x">HOVER</div>
       <div class="touch-btn" id="btn-fire" data-key="c">FIRE</div>
     </div>
@@ -115,20 +130,14 @@
 
 <div id="start-screen">
   <h1>LANDER</h1>
-  <div class="controls-row">
-    <div class="controls-col">
-      <p class="controls-label">Keyboard:</p>
-      <p>Arrow keys — steer</p>
-      <p>Z — thrust &nbsp; X — hover</p>
-      <p>C — fire</p>
-    </div>
-    <div class="controls-col">
-      <p class="controls-label">Touch:</p>
-      <p>Left stick — steer</p>
-      <p>Right buttons — thrust/hover/fire</p>
-    </div>
+  <div class="info desktop-info">
+    <b>Arrow keys</b> — steer &nbsp; <b>Z</b> — thrust &nbsp; <b>X</b> — hover &nbsp; <b>C</b> — fire
   </div>
-  <p style="margin-top:8px; color:#888;">Land gently on the launchpad to refuel</p>
+  <div class="info touch-info">
+    <b>Left stick</b> — steer<br>
+    <b>Right buttons</b> — thrust / hover / fire
+  </div>
+  <p class="hint">Land gently on the launchpad to refuel</p>
   <button class="start-btn" id="start-btn">START</button>
 </div>
 

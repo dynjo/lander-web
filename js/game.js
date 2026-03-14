@@ -100,11 +100,16 @@ class Game {
       }
     });
 
-    // Detect touch device and show touch controls
-    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    // Detect touch device: check touch support OR small screen (likely mobile)
+    const isTouchDevice = 'ontouchstart' in window
+      || navigator.maxTouchPoints > 0
+      || window.matchMedia('(pointer: coarse)').matches
+      || window.innerWidth <= 768;
     if (isTouchDevice) {
-      document.body.classList.add('touch-visible');
+      document.body.classList.add('is-touch');
       this.setupTouchControls();
+    } else {
+      document.body.classList.add('is-desktop');
     }
   }
 
