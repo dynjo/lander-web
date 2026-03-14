@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Lander</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; font-family: monospace; }
+  body { background: #000; overflow: hidden; font-family: monospace; touch-action: none; }
   canvas { display: block; }
   #hud {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -33,12 +33,57 @@
   }
   #start-screen h1 { font-size: 48px; margin-bottom: 24px; color: #0f0; }
   #start-screen p { font-size: 16px; margin: 4px 0; color: #ccc; }
+  #start-screen .controls-row { display: flex; gap: 32px; margin-top: 8px; }
+  #start-screen .controls-col p { text-align: left; }
+  #start-screen .controls-label { color: #888; font-size: 14px; margin-bottom: 4px; }
   #start-screen .start-btn {
     margin-top: 32px; padding: 12px 32px; font-size: 20px; font-family: monospace;
     background: #0a0; color: #fff; border: none; cursor: pointer;
     pointer-events: all;
   }
   #start-screen .start-btn:hover { background: #0c0; }
+
+  /* Touch controls */
+  #touch-controls {
+    display: none; position: absolute; bottom: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 5;
+  }
+  .touch-visible #touch-controls { display: block; }
+
+  #joystick-zone {
+    position: absolute; bottom: 20px; left: 20px; width: 140px; height: 140px;
+    pointer-events: all; touch-action: none;
+  }
+  #joystick-base {
+    width: 140px; height: 140px; border-radius: 50%;
+    background: rgba(255,255,255,0.08); border: 2px solid rgba(255,255,255,0.2);
+    position: relative;
+  }
+  #joystick-thumb {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    position: absolute; top: 45px; left: 45px;
+    transition: none;
+  }
+
+  #touch-buttons {
+    position: absolute; bottom: 20px; right: 20px;
+    display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+    pointer-events: all; touch-action: none;
+  }
+  .touch-btn {
+    width: 70px; height: 70px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.08);
+    color: #fff; font-family: monospace; font-size: 11px; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    user-select: none; -webkit-user-select: none;
+  }
+  .touch-btn.active {
+    background: rgba(255,255,255,0.25);
+    border-color: rgba(255,255,255,0.6);
+  }
+  #touch-buttons .row { display: flex; gap: 10px; }
 </style>
 </head>
 <body>
@@ -53,12 +98,36 @@
   <div id="message"></div>
 </div>
 
+<div id="touch-controls">
+  <div id="joystick-zone">
+    <div id="joystick-base">
+      <div id="joystick-thumb"></div>
+    </div>
+  </div>
+  <div id="touch-buttons">
+    <div class="touch-btn" id="btn-thrust" data-key="z">THRUST</div>
+    <div class="row">
+      <div class="touch-btn" id="btn-hover" data-key="x">HOVER</div>
+      <div class="touch-btn" id="btn-fire" data-key="c">FIRE</div>
+    </div>
+  </div>
+</div>
+
 <div id="start-screen">
   <h1>LANDER</h1>
-  <p>Arrow keys — steer ship</p>
-  <p>Z — full thrust</p>
-  <p>X — hover</p>
-  <p>C — fire</p>
+  <div class="controls-row">
+    <div class="controls-col">
+      <p class="controls-label">Keyboard:</p>
+      <p>Arrow keys — steer</p>
+      <p>Z — thrust &nbsp; X — hover</p>
+      <p>C — fire</p>
+    </div>
+    <div class="controls-col">
+      <p class="controls-label">Touch:</p>
+      <p>Left stick — steer</p>
+      <p>Right buttons — thrust/hover/fire</p>
+    </div>
+  </div>
   <p style="margin-top:8px; color:#888;">Land gently on the launchpad to refuel</p>
   <button class="start-btn" id="start-btn">START</button>
 </div>

@@ -99,6 +99,121 @@ class Game {
         this.player.handleKeyUp(e.key);
       }
     });
+
+    // Detect touch device and show touch controls
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+      document.body.classList.add('touch-visible');
+      this.setupTouchControls();
+    }
+  }
+
+  setupTouchControls() {
+    // Virtual joystick
+    const joystickZone = document.getElementById('joystick-zone');
+    const thumb = document.getElementById('joystick-thumb');
+    const baseRect = () => document.getElementById('joystick-base').getBoundingClientRect();
+    let joystickTouchId = null;
+
+    joystickZone.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (joystickTouchId !== null) return;
+      const t = e.changedTouches[0];
+      joystickTouchId = t.identifier;
+      this.updateJoystick(t, baseRect(), thumb);
+    });
+
+    joystickZone.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      for (const t of e.changedTouches) {
+        if (t.identifier === joystickTouchId) {
+          this.updateJoystick(t, baseRect(), thumb);
+        }
+      }
+    });
+
+    const resetJoystick = (e) => {
+      for (const t of e.changedTouches) {
+        if (t.identifier === joystickTouchId) {
+          joystickTouchId = null;
+          thumb.style.left = '45px';
+          thumb.style.top = '45px';
+          // Release all steer keys
+          this.player.handleKeyUp('ArrowLeft');
+          this.player.handleKeyUp('ArrowRight');
+          this.player.handleKeyUp('ArrowUp');
+          this.player.handleKeyUp('ArrowDown');
+        }
+      }
+    };
+    joystickZone.addEventListener('touchend', resetJoystick);
+    joystickZone.addEventListener('touchcancel', resetJoystick);
+
+    // Action buttons
+    const buttons = document.querySelectorAll('.touch-btn');
+    buttons.forEach(btn => {
+      const key = btn.dataset.key;
+
+      btn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        btn.classList.add('active');
+        if (!this.running) { this.start(); return; }
+        this.player.handleKeyDown(key);
+      });
+
+      btn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        btn.classList.remove('active');
+        this.player.handleKeyUp(key);
+      });
+
+      btn.addEventListener('touchcancel', (e) => {
+        btn.classList.remove('active');
+        this.player.handleKeyUp(key);
+      });
+    });
+  }
+
+  updateJoystick(touch, rect, thumb) {
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    let dx = touch.clientX - cx;
+    let dy = touch.clientY - cy;
+    const maxR = rect.width / 2 - 25;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxR) { dx = dx / dist * maxR; dy = dy / dist * maxR; }
+
+    thumb.style.left = (45 + dx) + 'px';
+    thumb.style.top = (45 + dy) + 'px';
+
+    // Map joystick to arrow key events
+    const deadzone = 0.25;
+    const nx = dx / maxR;
+    const ny = dy / maxR;
+
+    // Horizontal: left/right rotation
+    if (nx < -deadzone) {
+      this.player.handleKeyDown('ArrowLeft');
+      this.player.handleKeyUp('ArrowRight');
+    } else if (nx > deadzone) {
+      this.player.handleKeyDown('ArrowRight');
+      this.player.handleKeyUp('ArrowLeft');
+    } else {
+      this.player.handleKeyUp('ArrowLeft');
+      this.player.handleKeyUp('ArrowRight');
+    }
+
+    // Vertical: up/down pitch
+    if (ny < -deadzone) {
+      this.player.handleKeyDown('ArrowUp');
+      this.player.handleKeyUp('ArrowDown');
+    } else if (ny > deadzone) {
+      this.player.handleKeyDown('ArrowDown');
+      this.player.handleKeyUp('ArrowUp');
+    } else {
+      this.player.handleKeyUp('ArrowUp');
+      this.player.handleKeyUp('ArrowDown');
+    }
   }
 
   start() {
