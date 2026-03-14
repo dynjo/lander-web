@@ -235,7 +235,7 @@ export class Player {
     this.z += this.vz;
 
     // Height ceiling — keep landscape always visible (max ~8 tiles above ground)
-    const MAX_HEIGHT = 8;
+    const MAX_HEIGHT = 12;
     const ceilingAlt = getAltitude(this.x, this.z);
     const ceilingY = altToY(ceilingAlt) + MAX_HEIGHT;
     if (this.y > ceilingY) {
